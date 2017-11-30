@@ -1,0 +1,193 @@
+First Mini-Program - Chat Room
+................................................................. 2012/11/21
+
+ +   Overview    +
+
+In this homework, you will build up a chat room system. It contains two programs,
+a server and a client. Clients that connect to the same server can “talk” to one
+another. Server accepts connections from multiple clients, which stand for multiple
+users. Once a user types some messages and presses “Enter” to send messages to server,
+all other valid (will be defined latter in specification) users will see these
+messages on their screen.
+
+Hint: It is suggested that you should use select() for constructing the
+      concurrent Server/Client program.
+
+ + Specification +
+
+***Server***
+
+* Server can serve multiple users at the same time.
+
+-----------------------------------------------------------------------------
+
+* Setup user information:
+Server asks a client for its username right after the connection is built.
+
+ Send Format:
+
+	/serv What’s your name?
+
+	* A user’s name cannot be the same to any other users’.
+ 	* A username can only consist of 2~12 digits or English letters.
+
+Server will tell the client to give another name once it receives an invalid
+name.
+
+ Send Format:
+
+	/serv This name has been used by others.
+	/serv Username can only consists of 2~12 digits or English letters.
+
+For those clients that haven’t given a proper name, Server won’t send chat
+messages from others to them.
+After Server accepts the name that user gave, Server will send a welcome
+message to the user and broadcast this user’s coming to other valid users.
+
+ Send Format:
+
+	[To the new connected client]
+	/serv Hello <USERNAME>, welcome! Server IP: <Server IP>:<Server port>
+
+	[To existing clients]
+	/serv <USERNAME> is online.
+
+-----------------------------------------------------------------------------
+
+* Broadcast Message:
+While receiving some text from a valid user, Server adds
+“<SENDER USERNAME> SAID: “
+at the head of the original text and broadcasts to all users
+including the sender.
+
+ Send Format:
+
+	/msg <SENDER USERNAME> SAID: <ORIGINAL TEXT>
+
+-----------------------------------------------------------------------------
+
+* Leaving Message:
+When a valid user is leaving (connection closed), Server will send a
+notification message to other clients that are still online.
+
+ Send Format:
+
+	/serv <USERNAME> is offline.
+
+There are some function commands from clients that shouldn’t be treated as chat
+content.
+
+-----------------------------------------------------------------------------
+
+* Change username:
+A valid client can type command below to change his/her username.
+
+ Recv Format
+
+	/nick <NEW USERNAME>
+
+Server has to verify if new names are valid (Follow the same rule described above at
+the beginning of the spec for Server). It will reject user’s request if this name cannot
+fit the rule.
+
+ Send Format:
+
+	/serv <NEW USERNAME> has been used by others.
+	/serv Username can only consists of 2~12 digits or English letters.
+
+Server will reply some message to all users once a user changes his/her name.
+
+ Send Format:
+
+	[To user which changed his/her name]
+	/serv You’re now known as <NEW USERNAME>.
+
+	[To other valid users]
+	/serv <OLD USERNAME> is now known as <NEW USERNAME>.
+
+ Note:
+   A user can be rename as itself, that is, when "userA" wants to rename as "userA",
+   Server should not return error message.
+
+-----------------------------------------------------------------------------
+* List all users:
+A valid client can type command below to list all online users.
+
+ Recv Format:
+
+	/who
+
+Server will reply to sender a list of online users. For N user, Server will send N lines.
+Each of them shows details of a user.
+
+ Send Format:
+
+	/serv <USERNAME> <CLIENT IP>:<CLIENT PORT>
+
+-----------------------------------------------------------------------------
+
+
+***Client***
+
+A client cannot connect to more than one server at the same time.
+Users can give server IP and Port as the arguments of client program.
+
+ > ./client <SERVER IP> <SERVER PORT>
+
+Client will try to build a connection to server if the arguments are provided
+correctly (Two arguments). Giving arguments correctly is no guarantee of a
+successful connection construction to server.
+
+* If no arguments are given or connection construction is failed, Client should
+show an error message and let users use command below to tell Client to connect
+to another Server.
+
+ Command Format:
+	/connect <SERVER IP> <SERVER PORT>
+
+* User can type command below to end the process at any time.
+
+ Command Format:
+	/quit
+
+-----------------------------------------------------------------------------
+* Client can receive two kinds of messages from Server. Messages out of two kinds
+described below should be ignored (do not show on the screen).
+
+[Server System Messages]
+When Client recieved data begins with “/serv ”.
+
+ Recv Format:
+	/serv <TEXT>
+
+* Client should display content with “[Server]” added in front of the <TEXT>.
+ Display Format:
+	[Server] <TEXT>
+
+[Chat Messages]
+When Client recieved data begins with “/msg ”.
+
+ Recv Format:
+	/msg <TEXT>
+
+* Client only needs to show <TEXT> on the screen.
+ Display Format:
+	<TEXT>
+
+
+ +   Due date    +
+
+	2012/11/21 Wed. 23:59
+	Hand-in format : <Student ID>.tar
+
+	You should use the command below to tar your source code:
+
+12:05 jdchen@nsl5 [~/np/hw1] >tar -cvf 9517127.tar server.c client.c
+12:05 jdchen@nsl5 [~/np/hw1] >ls
+9517127.tar  client*  client.c  Makefile  server*  server.c
+
+ +     Demo      +
+
+    Demo will be announced later.
+
+
